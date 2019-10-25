@@ -13,11 +13,16 @@ License: GPL2
 function wp_mxibook_short_code($attrs){
   $id = $attrs['id'];
   $html_book = file_get_contents('http://book.maxibook.com.ar/index.php?horde='.$id);
-  $html_cont = $html_book;
+
+  $html_cont = str_replace("<script language='javascript' type='text/javascript' src='lib/js/jquery-1.7.2.min.js'></script>",' ',$html_book);
+  $html_cont = str_replace("<script src='lib/js/jquery.tooltipster.min.js'></script>",' ',$html_cont);
+  $html_cont = str_replace("<link rel='stylesheet' type='text/css' href='lib/estilo.css'>",' ',$html_cont);
+  $html_cont = str_replace("<link rel='stylesheet' type='text/css' href='lib/js/tooltipster.css'>",' ',$html_cont);
+
   $html_cont .= '<script src="'.plugin_dir_url(__FILE__).'js/jquery-1.7.2.min.js'.'"></script>';
   $html_cont .= '<script src="'.plugin_dir_url(__FILE__).'js/jquery.tooltipster.min.js'.'"></script>';
-  $html_cont .= '<link rel="stylesheet" type="text/css" href="'.plugin_dir_url(__FILE__).'css/maxbook-estilo.css'.'" media="screen" />';
   $html_cont .= '<link rel="stylesheet" type="text/css" href="'.plugin_dir_url(__FILE__).'css/tooltipster.css'.'" media="screen" />';
+  $html_cont .= '<link rel="stylesheet" type="text/css" href="'.plugin_dir_url(__FILE__).'css/maxbook-estilo.css'.'" media="screen" />';
 
   return '<div id="reserva" width="500" height="300" allowfullscreen>'.$html_cont.'</div>';
 }
