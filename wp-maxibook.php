@@ -8,10 +8,38 @@ Author:
 Author URI:
 License: GPL2
 */
+add_action('init', 'handle_mxibook_requests');
+function handle_mxibook_requests(){
+  if ($_GET['accion'] === 'get_mxbook_init_html'){
+    $id = $_GET['id'];
+    echo wp_mxibook_get_init_html($id);
+    die();
+  }
 
+  if ($_GET['accion'] === 'refrescarHora'){
+    die();
+  }
 
-function wp_mxibook_short_code($attrs){
-  $id         = $attrs['id'];
+  if ($_GET['accion'] === 'refrescarCombos'){
+    die();
+  }
+
+  if ($_GET['accion'] === 'getTraduccion'){
+    die();
+  }
+
+  if ($_GET['accion'] === 'prereserva'){
+    echo file_get_contents('http://book.maxibook.com.ar/index.php?horde='.$_GET['id'].'/');
+    die();
+  }
+
+  if ($_GET['accion'] === 'volver'){
+    die();
+  }
+
+}
+
+function wp_mxibook_get_init_html($id){
   $html_book  = file_get_contents('http://book.maxibook.com.ar/index.php?horde='.$id);
   $url_plugin = plugin_dir_url(__FILE__);
 
@@ -20,16 +48,22 @@ function wp_mxibook_short_code($attrs){
                             "<link rel='stylesheet' type='text/css' href='lib/estilo.css'>",
                             "<link rel='stylesheet' type='text/css' href='lib/js/tooltipster.css'>"],['','','',''],$html_book);
 
-  $html_cont = str_replace(["imagenes/load_zona.GIF",
+  $html_cont = str_replace(["index.php?",
+                            "imagenes/load_zona.GIF",
                             "imagenes/sombra_lateral.png",
-                            "imagenes/cubiertos_blanco.png"],[$url_plugin.'img/load_zona.GIF',$url_plugin.'img/sombra_lateral.png',$url_plugin.'img/cubiertos_blanco.png'],$html_cont);
+                            "imagenes/cubiertos_blanco.png"],['?id='.$id.'&',$url_plugin.'img/load_zona.GIF',$url_plugin.'img/sombra_lateral.png',$url_plugin.'img/cubiertos_blanco.png'],$html_cont);
 
-  $html_cont .= '<script src="'.$url_plugin.'js/jquery-1.7.2.min.js'.'"></script>';
-  $html_cont .= '<script src="'.$url_plugin.'js/jquery.tooltipster.min.js'.'"></script>';
+  $html_cont = '<script src="'.$url_plugin.'js/jquery-1.7.2.min.js'.'"></script>'.'<script src="'.$url_plugin.'js/jquery.tooltipster.min.js'.'"></script>'.$html_cont;
   $html_cont .= '<link rel="stylesheet" type="text/css" href="'.$url_plugin.'css/tooltipster.css'.'" media="screen" />';
   $html_cont .= '<link rel="stylesheet" type="text/css" href="'.$url_plugin.'css/maxbook-estilo.css'.'" media="screen" />';
 
-  return '<div id="reserva" width="500" height="300" allowfullscreen>'.$html_cont.'</div>';
+  return $html_cont;
+}
+
+function wp_mxibook_short_code($attrs){
+  $id = $attrs['id'];
+
+  return '<iframe id="reserva" width="500" height="300" allowfullscreen src="'.get_site_url().'/index.php/?id='.$id.'&action=get_mxbook_init_html"></iframe>';
 }
 add_shortcode('maxibook_form', 'wp_mxibook_short_code');
 
