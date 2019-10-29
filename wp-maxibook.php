@@ -52,18 +52,19 @@ function handle_mxibook_requests(){
     die();
   }
 
-  if ($_GET['accion'] === 'EnviaDatos' || $_GET['accion'] === 'confirmarreserva'){
-    $ch = curl_init('http://book.maxibook.com.ar/index.php?accion=EnviaDatos');
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, wp_mxibook_get_posts_string());
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: PHPSESSID=".strip_tags($_COOKIE['PHPSESSID'])]);
+  if ($_GET['accion'] === 'EnviaDatos' || $_GET['accion'] === 'confirmareserva'){
 
-    $html = curl_exec($ch).wp_mxibook_get_html_styles();
+    $boundary = md5(time());
+
+    $ch = curl_init('http://book.maxibook.com.ar/index.php?accion=confirmareserva');
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($ch, CURLOPT_POSTFIELDS,  $_POST);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: PHPSESSID=".strip_tags($_COOKIE['PHPSESSID'])]);
+    $html = curl_exec($ch);
     $html = str_replace(["index.php?"],['?id='.$_GET['id'].'&'],$html);
-    echo $html;
+    echo $html.wp_mxibook_get_html_styles();
     die();
   }
-
 }
 
 function wp_mxibook_get_html_styles(){
