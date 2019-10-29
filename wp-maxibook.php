@@ -29,7 +29,16 @@ function handle_mxibook_requests(){
   }
 
   if ($_GET['accion'] === 'prereserva'){
-    echo file_get_contents('http://book.maxibook.com.ar/index.php?accion=prereserva').wp_mxibook_get_html_styles();
+    $post_val = '';
+    foreach($_POST as $k => $v){
+      $post_val .= $k.'='.$v.'&';
+    }
+
+    $ch = curl_init('http://book.maxibook.com.ar/index.php?accion=prereserva');
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_val);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: PHPSESSID=".strip_tags($_COOKIE['PHPSESSID'])]);
+    echo curl_exec($ch).wp_mxibook_get_html_styles();
     die();
   }
 
