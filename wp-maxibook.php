@@ -8,6 +8,14 @@ Author:
 Author URI:
 License: GPL2
 */
+
+function wp_mxibook_get_posts_string(){
+  $post_val = '';
+
+  foreach($_POST as $k => $v){ $post_val .= $k.'='.$v.'&'; }
+  return $post_val;
+}
+
 add_action('init', 'handle_mxibook_requests');
 function handle_mxibook_requests(){
   if ($_GET['accion'] === 'get_mxbook_init_html'){
@@ -29,20 +37,30 @@ function handle_mxibook_requests(){
   }
 
   if ($_GET['accion'] === 'prereserva'){
-    $post_val = '';
-    foreach($_POST as $k => $v){
-      $post_val .= $k.'='.$v.'&';
-    }
-
     $ch = curl_init('http://book.maxibook.com.ar/index.php?accion=prereserva');
     curl_setopt($ch, CURLOPT_POST, TRUE);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_val);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, wp_mxibook_get_posts_string());
     curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: PHPSESSID=".strip_tags($_COOKIE['PHPSESSID'])]);
-    echo curl_exec($ch).wp_mxibook_get_html_styles();
+
+    $html = curl_exec($ch).wp_mxibook_get_html_styles();
+    $html = str_replace(["index.php?"],['?id='.$_GET['id'].'&'],$html);
+    echo $html;
     die();
   }
 
   if ($_GET['accion'] === 'volver'){
+    die();
+  }
+
+  if ($_GET['accion'] === 'EnviaDatos' || $_GET['accion'] === 'confirmarreserva'){
+    $ch = curl_init('http://book.maxibook.com.ar/index.php?accion=EnviaDatos');
+    curl_setopt($ch, CURLOPT_POST, TRUE);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, wp_mxibook_get_posts_string());
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ["Cookie: PHPSESSID=".strip_tags($_COOKIE['PHPSESSID'])]);
+
+    $html = curl_exec($ch).wp_mxibook_get_html_styles();
+    $html = str_replace(["index.php?"],['?id='.$_GET['id'].'&'],$html);
+    echo $html;
     die();
   }
 
